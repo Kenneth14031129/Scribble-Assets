@@ -4,10 +4,7 @@ import {
   X,
   Home,
   Package,
-  ClipboardList,
-  Users,
   Heart,
-  Wrench,
   ChevronDown,
   ChevronRight,
   Trash,
@@ -36,12 +33,6 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
       icon: Package,
       href: "/assets",
       current: location.pathname === "/assets",
-    },
-    {
-      name: "Users",
-      icon: Users,
-      href: "#",
-      current: currentPage === "Users",
     },
     {
       name: "Disposed Assets",

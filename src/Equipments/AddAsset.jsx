@@ -16,12 +16,8 @@ const AddAsset = ({ onClose, onSave }) => {
     name: "",
     category: "",
     serialNumber: "",
-    manufacturer: "",
-    model: "",
     purchaseDate: "",
     purchasePrice: "",
-    location: "",
-    assignedTo: "",
     condition: "excellent",
     image: null,
   });
@@ -35,20 +31,6 @@ const AddAsset = ({ onClose, onSave }) => {
     { value: "furniture", label: "Furniture" },
     { value: "supplies", label: "Supplies" },
     { value: "other", label: "Other" },
-  ];
-
-  const locations = [
-    "Reception Area",
-    "Waiting Room",
-    "Physical Therapy Room 1",
-    "Physical Therapy Room 2",
-    "Occupational Therapy Room",
-    "Speech Therapy Room",
-    "Examination Room 1",
-    "Examination Room 2",
-    "Storage Room",
-    "Office",
-    "Conference Room",
   ];
 
   const conditionOptions = [
@@ -92,7 +74,6 @@ const AddAsset = ({ onClose, onSave }) => {
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.serialNumber.trim())
       newErrors.serialNumber = "Serial number is required";
-    if (!formData.location) newErrors.location = "Location is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -211,22 +192,6 @@ const AddAsset = ({ onClose, onSave }) => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Model
-                        </label>
-                        <input
-                          type="text"
-                          name="model"
-                          value={formData.model}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Enter model number"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Serial Number *
                         </label>
                         <input
@@ -246,20 +211,6 @@ const AddAsset = ({ onClose, onSave }) => {
                             {errors.serialNumber}
                           </p>
                         )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Manufacturer
-                        </label>
-                        <input
-                          type="text"
-                          name="manufacturer"
-                          value={formData.manufacturer}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Enter manufacturer"
-                        />
                       </div>
                     </div>
                   </div>
@@ -308,54 +259,14 @@ const AddAsset = ({ onClose, onSave }) => {
 
               {/* Right Column */}
               <div className="space-y-6">
-                {/* Location & Assignment */}
+                {/* Additional Information */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2" />
-                    Location & Assignment
+                    <Settings className="w-5 h-5 mr-2" />
+                    Additional Information
                   </h3>
 
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Location *
-                      </label>
-                      <select
-                        name="location"
-                        value={formData.location}
-                        onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          errors.location ? "border-red-500" : "border-gray-300"
-                        }`}
-                      >
-                        <option value="">Select Location</option>
-                        {locations.map((location) => (
-                          <option key={location} value={location}>
-                            {location}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.location && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.location}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Assigned To
-                      </label>
-                      <input
-                        type="text"
-                        name="assignedTo"
-                        value={formData.assignedTo}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter staff member name"
-                      />
-                    </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Condition
@@ -401,38 +312,27 @@ const AddAsset = ({ onClose, onSave }) => {
                   </div>
                 </div>
 
-                {/* Additional Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <Settings className="w-5 h-5 mr-2" />
-                    Additional Information
-                  </h3>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Asset Image
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Asset Image
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label htmlFor="image-upload" className="cursor-pointer">
+                        <Camera className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-600">
+                          {formData.image
+                            ? formData.image.name
+                            : "Click to upload image"}
+                        </p>
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          id="image-upload"
-                        />
-                        <label
-                          htmlFor="image-upload"
-                          className="cursor-pointer"
-                        >
-                          <Camera className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-600">
-                            {formData.image
-                              ? formData.image.name
-                              : "Click to upload image"}
-                          </p>
-                        </label>
-                      </div>
                     </div>
                   </div>
                 </div>

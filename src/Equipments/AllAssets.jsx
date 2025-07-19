@@ -29,7 +29,6 @@ const AllAssets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterCondition, setFilterCondition] = useState("");
-  const [filterLocation, setFilterLocation] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +39,7 @@ const AllAssets = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 4;
 
   // Sample asset data
   const allAssets = [
@@ -50,8 +49,6 @@ const AllAssets = () => {
       serialNumber: "USM-2024-001",
       category: "Medical Equipment",
       condition: "excellent",
-      location: "Examination Room 1",
-      assignedTo: "Dr. Sarah Johnson",
       purchaseDate: "2024-01-15",
       purchasePrice: 45000,
       status: "available",
@@ -62,8 +59,6 @@ const AllAssets = () => {
       serialNumber: "PTT-2023-012",
       category: "Therapy Tools",
       condition: "good",
-      location: "Physical Therapy Room 1",
-      assignedTo: "Therapist Mike Chen",
       purchaseDate: "2023-08-20",
       purchasePrice: 2800,
       status: "in-use",
@@ -74,8 +69,6 @@ const AllAssets = () => {
       serialNumber: "WC-2024-008",
       category: "Therapy Tools",
       condition: "excellent",
-      location: "Storage Room",
-      assignedTo: null,
       purchaseDate: "2024-03-10",
       purchasePrice: 350,
       status: "available",
@@ -86,8 +79,6 @@ const AllAssets = () => {
       serialNumber: "EBP-2024-003",
       category: "Therapy Tools",
       condition: "poor",
-      location: "Physical Therapy Room 2",
-      assignedTo: "Therapist Lisa Wong",
       purchaseDate: "2024-02-14",
       purchasePrice: 3500,
       status: "out-of-service",
@@ -98,8 +89,6 @@ const AllAssets = () => {
       serialNumber: "EBP-2024-003",
       category: "Therapy Tools",
       condition: "poor",
-      location: "Physical Therapy Room 2",
-      assignedTo: "Therapist Lisa Wong",
       purchaseDate: "2024-02-14",
       purchasePrice: 3500,
       status: "out-of-service",
@@ -110,8 +99,6 @@ const AllAssets = () => {
       serialNumber: "DGS-2024-010",
       category: "Supplies",
       condition: "excellent",
-      location: "Storage Room",
-      assignedTo: null,
       purchaseDate: "2024-07-01",
       purchasePrice: 150,
       status: "available",
@@ -131,17 +118,6 @@ const AllAssets = () => {
     { value: "fair", label: "Fair", color: "yellow" },
     { value: "poor", label: "Poor", color: "red" },
     { value: "out-of-service", label: "Out of Service", color: "gray" },
-  ];
-
-  const locations = [
-    "Reception Area",
-    "Waiting Room",
-    "Physical Therapy Room 1",
-    "Physical Therapy Room 2",
-    "Examination Room 1",
-    "Examination Room 2",
-    "Storage Room",
-    "Office",
   ];
 
   const statusOptions = [
@@ -165,18 +141,13 @@ const AllAssets = () => {
     .filter((asset) => {
       const matchesSearch =
         asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        asset.serialNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        asset.assignedTo?.toLowerCase().includes(searchTerm.toLowerCase());
+        asset.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory =
         !filterCategory || asset.category === filterCategory;
       const matchesCondition =
         !filterCondition || asset.condition === filterCondition;
-      const matchesLocation =
-        !filterLocation || asset.location === filterLocation;
 
-      return (
-        matchesSearch && matchesCategory && matchesCondition && matchesLocation
-      );
+      return matchesSearch && matchesCategory && matchesCondition;
     })
     .sort((a, b) => {
       let aValue = a[sortBy];
@@ -224,7 +195,6 @@ const AllAssets = () => {
     setSearchTerm("");
     setFilterCategory("");
     setFilterCondition("");
-    setFilterLocation("");
   };
 
   return (
@@ -341,23 +311,7 @@ const AllAssets = () => {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                      Location
-                    </label>
-                    <select
-                      value={filterLocation}
-                      onChange={(e) => setFilterLocation(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">All Locations</option>
-                      {locations.map((location) => (
-                        <option key={location} value={location}>
-                          {location}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+
                   <div className="flex items-end">
                     <button
                       onClick={clearFilters}
@@ -501,7 +455,14 @@ const AllAssets = () => {
                             </button>
 
                             {showActionMenu === asset.id && (
-                              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                              <div
+                                className={`absolute right-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10 ${
+                                  paginatedAssets.indexOf(asset) >=
+                                  paginatedAssets.length - 2
+                                    ? "bottom-full mb-1"
+                                    : "top-full mt-1"
+                                }`}
+                              >
                                 <div className="py-1">
                                   <button
                                     onClick={() => {
@@ -618,7 +579,14 @@ const AllAssets = () => {
                         </button>
 
                         {showActionMenu === asset.id && (
-                          <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                          <div
+                            className={`absolute right-0 w-44 bg-white rounded-lg shadow-lg border border-gray-200 z-10 ${
+                              paginatedAssets.indexOf(asset) >=
+                              paginatedAssets.length - 2
+                                ? "bottom-full mb-1"
+                                : "top-full mt-1"
+                            }`}
+                          >
                             <div className="py-1">
                               <button
                                 onClick={() => {
@@ -736,10 +704,7 @@ const AllAssets = () => {
                 No assets found
               </h3>
               <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6">
-                {searchTerm ||
-                filterCategory ||
-                filterCondition ||
-                filterLocation
+                {searchTerm || filterCategory || filterCondition
                   ? "Try adjusting your search or filter criteria."
                   : "Get started by adding your first asset to the system."}
               </p>

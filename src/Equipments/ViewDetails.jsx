@@ -178,7 +178,10 @@ const ViewDetails = ({ asset, onClose }) => {
                     </div>
                   </div>
                 </div>
+              </div>
 
+              {/* Right Column */}
+              <div className="space-y-4 sm:space-y-6">
                 {/* Purchase Information */}
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
@@ -200,36 +203,6 @@ const ViewDetails = ({ asset, onClose }) => {
                       </span>
                       <span className="text-xs sm:text-sm text-gray-900 font-semibold">
                         {formatCurrency(asset.purchasePrice)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-4 sm:space-y-6">
-                {/* Location & Assignment */}
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
-                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    Location & Assignment
-                  </h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:justify-between py-2 gap-1 sm:gap-0">
-                      <span className="text-xs sm:text-sm font-medium text-gray-500">
-                        Location
-                      </span>
-                      <span className="text-xs sm:text-sm text-gray-900 break-words">
-                        {asset.location}
-                      </span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-t border-gray-100 gap-1 sm:gap-0">
-                      <span className="text-xs sm:text-sm font-medium text-gray-500 flex items-center">
-                        <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Assigned To
-                      </span>
-                      <span className="text-xs sm:text-sm text-gray-900">
-                        {asset.assignedTo || "Not assigned"}
                       </span>
                     </div>
                   </div>
