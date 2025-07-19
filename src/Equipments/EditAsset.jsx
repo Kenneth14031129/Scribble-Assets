@@ -55,7 +55,6 @@ const EditAsset = ({ asset, onClose, onSave }) => {
     { value: "Medical Equipment", label: "Medical Equipment" },
     { value: "Therapy Tools", label: "Therapy Tools" },
     { value: "Furniture", label: "Furniture" },
-    { value: "IT Equipment", label: "IT Equipment" },
     { value: "Supplies", label: "Supplies" },
     { value: "Other", label: "Other" },
   ];

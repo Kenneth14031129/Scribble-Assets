@@ -82,15 +82,15 @@ const AllAssets = () => {
     },
     {
       id: 4,
-      name: "Computer Workstation #5",
-      serialNumber: "CWS-2022-005",
-      category: "IT Equipment",
-      condition: "fair",
-      location: "Reception Area",
-      assignedTo: "Receptionist Anna Lee",
-      purchaseDate: "2022-11-30",
-      purchasePrice: 1200,
-      status: "in-use",
+      name: "Exercise Bike Pro",
+      serialNumber: "EBP-2024-003",
+      category: "Therapy Tools",
+      condition: "poor",
+      location: "Physical Therapy Room 2",
+      assignedTo: "Therapist Lisa Wong",
+      purchaseDate: "2024-02-14",
+      purchasePrice: 3500,
+      status: "out-of-service",
     },
     {
       id: 5,
@@ -122,7 +122,6 @@ const AllAssets = () => {
     "Medical Equipment",
     "Therapy Tools",
     "Furniture",
-    "IT Equipment",
     "Supplies",
   ];
 
