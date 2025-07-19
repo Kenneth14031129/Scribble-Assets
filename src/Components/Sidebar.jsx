@@ -10,6 +10,7 @@ import {
   Wrench,
   ChevronDown,
   ChevronRight,
+  Trash,
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
@@ -43,16 +44,10 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
       current: currentPage === "Users",
     },
     {
-      name: "Inventory",
-      icon: ClipboardList,
+      name: "Disposed Assets",
+      icon: Trash,
       href: "#",
-      current: currentPage === "Inventory",
-    },
-    {
-      name: "Maintenance",
-      icon: Wrench,
-      href: "#",
-      current: currentPage === "Maintenance",
+      current: currentPage === "Diposed",
     },
   ];
 
@@ -149,7 +144,7 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
                       key={child.name}
                       to={child.href}
                       className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
-                      onClick={onClose} // Close sidebar on mobile
+                      onClick={onClose}
                     >
                       {child.name}
                     </Link>
@@ -164,7 +159,7 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 backdrop-blur bg-opacity-50 z-40 lg:hidden"
           onClick={onClose}
         ></div>
       )}

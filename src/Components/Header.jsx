@@ -28,14 +28,6 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
     },
     {
       id: 2,
-      title: "Maintenance Due",
-      message: "Ultrasound Machine needs servicing",
-      time: "1 hour ago",
-      type: "info",
-      read: false,
-    },
-    {
-      id: 3,
       title: "New Asset Added",
       message: "Physical Therapy Table added successfully",
       time: "2 hours ago",
@@ -65,23 +57,6 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Search Bar */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search assets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64 text-sm"
-            />
-          </div>
-
-          {/* Mobile Search Button */}
-          <button className="md:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-
           {/* Notifications */}
           <div className="relative">
             <button

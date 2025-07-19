@@ -36,13 +36,6 @@ const Dashboard = () => {
       icon: Clock,
       color: "yellow",
     },
-    {
-      title: "Maintenance",
-      value: "57",
-      trending: "down",
-      icon: Wrench,
-      color: "red",
-    },
   ];
 
   const recentActivities = [
@@ -56,14 +49,6 @@ const Dashboard = () => {
     },
     {
       id: 2,
-      action: "Maintenance completed",
-      item: "Physical Therapy Table #12",
-      user: "Maintenance Team",
-      time: "4 hours ago",
-      type: "maintenance",
-    },
-    {
-      id: 3,
       action: "Asset transferred",
       item: "Wheelchair - Standard",
       user: "Nurse Emily Chen",
@@ -71,7 +56,7 @@ const Dashboard = () => {
       type: "transfer",
     },
     {
-      id: 4,
+      id: 3,
       action: "Low stock alert",
       item: "Disposable Gloves",
       user: "System",
@@ -84,7 +69,6 @@ const Dashboard = () => {
     { name: "Medical Equipment", count: 456, color: "blue" },
     { name: "Therapy Tools", count: 289, color: "green" },
     { name: "Furniture", count: 234, color: "yellow" },
-    { name: "IT Equipment", count: 178, color: "purple" },
     { name: "Supplies", count: 90, color: "red" },
   ];
 
@@ -124,7 +108,7 @@ const Dashboard = () => {
         {/* Dashboard Content */}
         <main className="p-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {stats.map((stat) => (
               <div
                 key={stat.title}
@@ -205,8 +189,6 @@ const Dashboard = () => {
                           className={`w-8 h-8 rounded-full flex items-center justify-center ${
                             activity.type === "add"
                               ? "bg-green-100"
-                              : activity.type === "maintenance"
-                              ? "bg-blue-100"
                               : activity.type === "transfer"
                               ? "bg-yellow-100"
                               : "bg-red-100"
@@ -214,8 +196,6 @@ const Dashboard = () => {
                         >
                           {activity.type === "add" ? (
                             <Plus className="w-4 h-4 text-green-600" />
-                          ) : activity.type === "maintenance" ? (
-                            <Wrench className="w-4 h-4 text-blue-600" />
                           ) : activity.type === "transfer" ? (
                             <Package className="w-4 h-4 text-yellow-600" />
                           ) : (
