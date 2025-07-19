@@ -14,29 +14,6 @@ import {
 const Header = ({ onMenuClick = "Dashboard" }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [notificationDropdownOpen, setNotificationDropdownOpen] =
-    useState(false);
-
-  const notifications = [
-    {
-      id: 1,
-      title: "Low Stock Alert",
-      message: "Disposable Gloves running low",
-      time: "5 min ago",
-      type: "warning",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "New Asset Added",
-      message: "Physical Therapy Table added successfully",
-      time: "2 hours ago",
-      type: "success",
-      read: true,
-    },
-  ];
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleLogout = () => {
     // Handle logout logic here
@@ -57,67 +34,6 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() =>
-                setNotificationDropdownOpen(!notificationDropdownOpen)
-              }
-              className="relative p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <Bell className="w-6 h-6" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {notificationDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Notifications
-                  </h3>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`px-4 py-3 hover:bg-gray-50 transition-colors ${
-                        !notification.read ? "bg-blue-50" : ""
-                      }`}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div
-                          className={`w-2 h-2 rounded-full mt-2 ${
-                            notification.type === "warning"
-                              ? "bg-yellow-500"
-                              : notification.type === "info"
-                              ? "bg-blue-500"
-                              : "bg-green-500"
-                          }`}
-                        ></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {notification.title}
-                          </p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {notification.time}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Profile Dropdown */}
           <div className="relative">
             <button
@@ -148,10 +64,6 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
                     <Settings className="w-4 h-4 mr-3" />
                     Settings
                   </button>
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <HelpCircle className="w-4 h-4 mr-3" />
-                    Help & Support
-                  </button>
                   <div className="border-t border-gray-300 mt-1 pt-1">
                     <button
                       onClick={handleLogout}
@@ -181,17 +93,6 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
           />
         </div>
       </div>
-
-      {/* Click outside to close dropdowns */}
-      {(profileDropdownOpen || notificationDropdownOpen) && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => {
-            setProfileDropdownOpen(false);
-            setNotificationDropdownOpen(false);
-          }}
-        ></div>
-      )}
     </header>
   );
 };
