@@ -2,29 +2,22 @@ import { useState } from "react";
 import {
   Search,
   Filter,
-  Plus,
-  Edit2,
-  Trash2,
   Eye,
   Download,
-  Upload,
   Package,
-  Wrench,
-  CheckCircle,
-  Clock,
   XCircle,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   MoreVertical,
+  Edit2,
 } from "lucide-react";
-import Header from "../Components/Header";
-import Sidebar from "../Components/Sidebar";
-import AddAsset from "./AddAsset";
-import ViewDetails from "./ViewDetails";
-import EditAsset from "./EditAsset";
+import Header from "./Components/Header";
+import Sidebar from "./Components/Sidebar";
+import ViewDetails from "./Equipments/ViewDetails";
+import EditAsset from "./Equipments/EditAsset";
 
-const AllAssets = () => {
+const Disposed = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -34,74 +27,93 @@ const AllAssets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
 
   const itemsPerPage = 4;
 
-  // Sample asset data
+  // Sample out-of-service assets data (all disposed/out-of-service assets)
   const allAssets = [
     {
       id: 1,
-      name: "Ultrasound Machine X200",
-      serialNumber: "USM-2024-001",
+      name: "Old Ultrasound Machine",
+      serialNumber: "USM-2019-005",
       category: "Medical Equipment",
-      condition: "excellent",
-      purchaseDate: "2024-01-15",
-      purchasePrice: 45000,
-      status: "available",
+      condition: "poor",
+      purchaseDate: "2019-06-15",
+      purchasePrice: 38000,
+      status: "out-of-service",
     },
     {
       id: 2,
-      name: "Physical Therapy Table #12",
-      serialNumber: "PTT-2023-012",
+      name: "Broken Exercise Bike",
+      serialNumber: "EBP-2020-001",
       category: "Therapy Tools",
-      condition: "good",
-      purchaseDate: "2023-08-20",
+      condition: "poor",
+      purchaseDate: "2020-07-02",
       purchasePrice: 2800,
-      status: "in-use",
+      status: "out-of-service",
     },
     {
       id: 3,
-      name: "Wheelchair - Standard",
-      serialNumber: "WC-2024-008",
+      name: "Damaged Physical Therapy Table",
+      serialNumber: "PTT-2018-003",
       category: "Therapy Tools",
-      condition: "excellent",
-      purchaseDate: "2024-03-10",
-      purchasePrice: 350,
-      status: "available",
+      condition: "poor",
+      purchaseDate: "2018-05-20",
+      purchasePrice: 3200,
+      status: "out-of-service",
     },
     {
       id: 4,
-      name: "Exercise Bike Pro",
-      serialNumber: "EBP-2024-003",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2024-02-14",
-      purchasePrice: 3500,
-      status: "available",
+      name: "Outdated X-Ray Machine",
+      serialNumber: "XRM-2017-002",
+      category: "Medical Equipment",
+      condition: "fair",
+      purchaseDate: "2017-04-10",
+      purchasePrice: 65000,
+      status: "out-of-service",
     },
     {
       id: 5,
+      name: "Worn Office Chair Set",
+      serialNumber: "OCS-2019-012",
+      category: "Furniture",
+      condition: "poor",
+      purchaseDate: "2019-03-25",
+      purchasePrice: 1200,
+      status: "out-of-service",
+    },
+    {
+      id: 6,
+      name: "Faulty Nebulizer Unit",
+      serialNumber: "NEB-2020-008",
+      category: "Medical Equipment",
+      condition: "poor",
+      purchaseDate: "2020-07-18",
+      purchasePrice: 800,
+      status: "out-of-service",
+    },
+    {
+      id: 7,
       name: "Exercise Bike Pro",
       serialNumber: "EBP-2024-003",
       category: "Therapy Tools",
       condition: "poor",
       purchaseDate: "2024-02-14",
       purchasePrice: 3500,
-      status: "available",
+      status: "out-of-service",
     },
     {
-      id: 6,
-      name: "Disposable Gloves Supply",
-      serialNumber: "DGS-2024-010",
-      category: "Supplies",
-      condition: "excellent",
-      purchaseDate: "2024-07-01",
-      purchasePrice: 150,
-      status: "available",
+      id: 8,
+      name: "Exercise Bike Pro",
+      serialNumber: "EBP-2024-004",
+      category: "Therapy Tools",
+      condition: "poor",
+      purchaseDate: "2024-02-14",
+      purchasePrice: 3500,
+      status: "out-of-service",
     },
   ];
 
@@ -121,13 +133,6 @@ const AllAssets = () => {
   ];
 
   const statusOptions = [
-    {
-      value: "available",
-      label: "Available",
-      color: "green",
-      icon: CheckCircle,
-    },
-    { value: "in-use", label: "In Use", color: "blue", icon: Clock },
     {
       value: "out-of-service",
       label: "Out of Service",
@@ -202,11 +207,14 @@ const AllAssets = () => {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        currentPage="Assets"
+        currentPage="Disposed Assets"
       />
 
       <div className="lg:ml-64">
-        <Header onMenuClick={() => setSidebarOpen(true)} title="All Assets" />
+        <Header
+          onMenuClick={() => setSidebarOpen(true)}
+          title="Disposed Assets"
+        />
 
         <main className="p-3 sm:p-4 lg:p-6">
           {/* Header Section */}
@@ -214,23 +222,16 @@ const AllAssets = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  Asset Management
+                  Disposed Assets
                 </h1>
                 <p className="text-sm sm:text-base text-gray-600">
-                  Manage and track all therapy center assets
+                  Manage and track all out of service assets
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <button className="flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Export
-                </button>
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  Add Asset
                 </button>
               </div>
             </div>
@@ -244,7 +245,7 @@ const AllAssets = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search assets..."
+                    placeholder="Search disposed assets..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -327,7 +328,7 @@ const AllAssets = () => {
             <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-base sm:text-lg font-medium text-gray-900">
-                  Assets ({filteredAssets.length})
+                  Disposed Assets ({filteredAssets.length})
                 </h3>
               </div>
             </div>
@@ -378,8 +379,8 @@ const AllAssets = () => {
                       <tr key={asset.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                              <Package className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                              <XCircle className="w-5 h-5 text-red-600" />
                             </div>
                             <div>
                               <div className="text-sm font-medium text-gray-900">
@@ -508,8 +509,8 @@ const AllAssets = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                          <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm sm:text-base font-medium text-gray-900 truncate">
@@ -624,7 +625,7 @@ const AllAssets = () => {
                   <div className="text-xs sm:text-sm text-gray-700 order-2 sm:order-1">
                     Showing {startIndex + 1} to{" "}
                     {Math.min(startIndex + itemsPerPage, filteredAssets.length)}{" "}
-                    of {filteredAssets.length} assets
+                    of {filteredAssets.length} disposed assets
                   </div>
                   <div className="flex items-center space-x-1 sm:space-x-2 order-1 sm:order-2">
                     <button
@@ -695,31 +696,19 @@ const AllAssets = () => {
           {/* Empty State */}
           {filteredAssets.length === 0 && (
             <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">
-              <Package className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+              <XCircle className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
-                No assets found
+                No disposed assets found
               </h3>
               <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6">
                 {searchTerm || filterCategory || filterCondition
                   ? "Try adjusting your search or filter criteria."
-                  : "Get started by adding your first asset to the system."}
+                  : "No assets are currently out of service."}
               </p>
             </div>
           )}
         </main>
       </div>
-
-      {/* Add Asset Modal */}
-      {showAddModal && (
-        <AddAsset
-          onClose={() => setShowAddModal(false)}
-          onSave={(newAssetData) => {
-            console.log("New asset data:", newAssetData);
-            // Here you would typically add the asset to your state or send to API
-            setShowAddModal(false);
-          }}
-        />
-      )}
 
       {/* View Details Modal */}
       {showViewModal && selectedAsset && (
@@ -757,4 +746,4 @@ const AllAssets = () => {
   );
 };
 
-export default AllAssets;
+export default Disposed;

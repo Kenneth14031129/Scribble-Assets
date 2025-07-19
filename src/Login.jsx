@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -7,7 +7,6 @@ import {
   Heart,
   Shield,
   BarChart3,
-  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -47,13 +46,13 @@ const Login = () => {
           {/* Left Side - Information - Hidden on mobile/tablet */}
           <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-500 to-blue-700 p-12 flex-col justify-center text-white relative min-h-[600px]">
             <div className="relative z-10">
-              <h1 className="text-4xl font-bold mb-4">Therapy Center</h1>
+              <h1 className="text-4xl font-bold mb-4">Scribble Center</h1>
               <h2 className="text-2xl font-light mb-8 text-blue-100">
                 Asset Management System
               </h2>
 
               <p className="text-lg mb-12 text-blue-100 leading-relaxed">
-                Streamline your therapy center's asset tracking and management
+                Streamline your scribble center's asset tracking and management
                 with our comprehensive digital solution.
               </p>
 
@@ -82,20 +81,6 @@ const Login = () => {
                     </h3>
                     <p className="text-sm text-blue-100 leading-relaxed">
                       Monitor assets and inventory in real-time
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-base">
-                      Team Collaboration
-                    </h3>
-                    <p className="text-sm text-blue-100 leading-relaxed">
-                      Seamless workflow management
                     </p>
                   </div>
                 </div>
@@ -216,7 +201,7 @@ const Login = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Forgot your email or password?{" "}
                   <button className="text-blue-600 hover:text-blue-800 transition-colors font-medium">
-                    Contact Administrator
+                    Contact IT Support
                   </button>
                 </p>
               </div>

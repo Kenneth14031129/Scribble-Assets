@@ -10,7 +10,7 @@ import {
   Trash,
 } from "lucide-react";
 
-const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
+const Sidebar = ({ isOpen, onClose }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const location = useLocation();
 
@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
       current: location.pathname === "/dashboard",
     },
     {
-      name: "Assets",
+      name: "All Assets",
       icon: Package,
       href: "/assets",
       current: location.pathname === "/assets",
@@ -37,8 +37,8 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
     {
       name: "Disposed Assets",
       icon: Trash,
-      href: "#",
-      current: currentPage === "Diposed",
+      href: "/disposed",
+      current: location.pathname === "/disposed",
     },
   ];
 
@@ -58,7 +58,7 @@ const Sidebar = ({ isOpen, onClose, currentPage = "Dashboard" }) => {
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">
-                Therapy Center
+                Scribble Center
               </h1>
               <p className="text-xs text-gray-500">Asset Management</p>
             </div>

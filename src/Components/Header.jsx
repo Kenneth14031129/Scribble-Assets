@@ -1,24 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
-  Bell,
-  Settings,
   User,
   Menu,
   ChevronDown,
   LogOut,
   UserCircle,
-  HelpCircle,
 } from "lucide-react";
 
 const Header = ({ onMenuClick = "Dashboard" }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     // Handle logout logic here
     console.log("Logging out...");
-    // In a real app, you'd clear tokens, redirect to login, etc.
+    navigate("/");
   };
 
   return (
@@ -56,13 +55,12 @@ const Header = ({ onMenuClick = "Dashboard" }) => {
                   <p className="text-xs text-gray-500">admin@therapy.com</p>
                 </div>
                 <div className="py-1">
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
                     <UserCircle className="w-4 h-4 mr-3" />
                     Profile
-                  </button>
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <Settings className="w-4 h-4 mr-3" />
-                    Settings
                   </button>
                   <div className="border-t border-gray-300 mt-1 pt-1">
                     <button
