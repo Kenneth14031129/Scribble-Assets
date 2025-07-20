@@ -8,8 +8,6 @@ import {
   Camera,
   Settings,
   Clock,
-  CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import { createAsset } from "../services/api";
 
@@ -26,8 +24,6 @@ const AddAsset = ({ onClose, onSave }) => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState("");
 
   const categories = [
     { value: "medical", label: "Medical Equipment" },
@@ -89,8 +85,6 @@ const AddAsset = ({ onClose, onSave }) => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    setSubmitError("");
-    setSubmitSuccess(false);
 
     try {
       // Prepare data for API
@@ -107,20 +101,15 @@ const AddAsset = ({ onClose, onSave }) => {
 
       const result = await createAsset(apiData, formData.image);
 
-      setSubmitSuccess(true);
-
       if (onSave) {
         onSave(result.data);
       }
 
-      setTimeout(() => {
-        if (onClose) {
-          onClose();
-        }
-      }, 1500);
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error("Error saving asset:", error);
-      setSubmitError(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -148,26 +137,6 @@ const AddAsset = ({ onClose, onSave }) => {
             </button>
           </div>
         </div>
-
-        {/* Success/Error Messages */}
-        {(submitSuccess || submitError) && (
-          <div className="px-6 py-3 border-b border-gray-200">
-            {submitSuccess && (
-              <div className="flex items-center text-green-600 bg-green-50 p-3 rounded-lg">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                <span className="text-sm font-medium">
-                  Asset created successfully!
-                </span>
-              </div>
-            )}
-            {submitError && (
-              <div className="flex items-center text-red-600 bg-red-50 p-3 rounded-lg">
-                <AlertCircle className="w-5 h-5 mr-2" />
-                <span className="text-sm font-medium">{submitError}</span>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Form Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-140px)]">

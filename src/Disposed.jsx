@@ -18,6 +18,7 @@ import Sidebar from "./Components/Sidebar";
 import ViewDetails from "./Equipments/ViewDetails";
 import EditAsset from "./Equipments/EditAsset";
 import { fetchDisposedAssets } from "./services/api";
+import { useToast } from "./contexts/ToastContext";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
@@ -44,7 +45,7 @@ const Disposed = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [allAssets, setAllAssets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { showSuccess, showError } = useToast();
 
   const itemsPerPage = 4;
 
@@ -70,7 +71,7 @@ const Disposed = () => {
   const loadDisposedAssets = async () => {
     try {
       setLoading(true);
-      setError(null);
+      // Remove setError(null); since we're using toasts now
       const assets = await fetchDisposedAssets();
 
       // Transform the data to match your existing format
@@ -92,7 +93,7 @@ const Disposed = () => {
       setAllAssets(transformedAssets);
     } catch (err) {
       console.error("Error loading disposed assets:", err);
-      setError("Failed to load disposed assets. Please try again.");
+      showError("Failed to load disposed assets. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -659,22 +660,6 @@ const Disposed = () => {
             </div>
           </div>
         )}
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center">
-              <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-              <p className="text-red-800">{error}</p>
-              <button
-                onClick={loadDisposedAssets}
-                className="ml-auto px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* View Details Modal */}
@@ -706,6 +691,7 @@ const Disposed = () => {
             setShowEditModal(false);
             setSelectedAsset(null);
             loadDisposedAssets();
+            showSuccess("Disposed asset updated successfully!");
           }}
         />
       )}
