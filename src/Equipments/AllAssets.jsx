@@ -1,15 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
   Plus,
   Edit2,
-  Trash2,
   Eye,
   Download,
-  Upload,
   Package,
-  Wrench,
   CheckCircle,
   Clock,
   XCircle,
@@ -23,6 +20,19 @@ import Sidebar from "../Components/Sidebar";
 import AddAsset from "./AddAsset";
 import ViewDetails from "./ViewDetails";
 import EditAsset from "./EditAsset";
+import { fetchAssets, deleteAsset } from "../services/api";
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+
+  // If the path already includes the full URL, return as is
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+
+  // If it's a relative path, prepend the backend URL
+  return `http://localhost:5000${imagePath}`;
+};
 
 const AllAssets = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,78 +48,68 @@ const AllAssets = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [allAssets, setAllAssets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 4;
 
-  // Sample asset data
-  const allAssets = [
-    {
-      id: 1,
-      name: "Ultrasound Machine X200",
-      serialNumber: "USM-2024-001",
-      category: "Medical Equipment",
-      condition: "excellent",
-      purchaseDate: "2024-01-15",
-      purchasePrice: 45000,
-      status: "available",
-    },
-    {
-      id: 2,
-      name: "Physical Therapy Table #12",
-      serialNumber: "PTT-2023-012",
-      category: "Therapy Tools",
-      condition: "good",
-      purchaseDate: "2023-08-20",
-      purchasePrice: 2800,
-      status: "in-use",
-    },
-    {
-      id: 3,
-      name: "Wheelchair - Standard",
-      serialNumber: "WC-2024-008",
-      category: "Therapy Tools",
-      condition: "excellent",
-      purchaseDate: "2024-03-10",
-      purchasePrice: 350,
-      status: "available",
-    },
-    {
-      id: 4,
-      name: "Exercise Bike Pro",
-      serialNumber: "EBP-2024-003",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2024-02-14",
-      purchasePrice: 3500,
-      status: "available",
-    },
-    {
-      id: 5,
-      name: "Exercise Bike Pro",
-      serialNumber: "EBP-2024-003",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2024-02-14",
-      purchasePrice: 3500,
-      status: "available",
-    },
-    {
-      id: 6,
-      name: "Disposable Gloves Supply",
-      serialNumber: "DGS-2024-010",
-      category: "Supplies",
-      condition: "excellent",
-      purchaseDate: "2024-07-01",
-      purchasePrice: 150,
-      status: "available",
-    },
-  ];
+  useEffect(() => {
+    loadAssets();
+  }, []);
+
+  // Add this function to load assets from the database
+  const loadAssets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const assets = await fetchAssets();
+
+      // Transform the data to match your existing format
+      const transformedAssets = assets.map((asset) => ({
+        id: asset._id,
+        name: asset.name,
+        serialNumber: asset.serialNumber,
+        category: getCategoryLabel(asset.category),
+        condition: asset.condition,
+        purchaseDate: asset.purchaseDate
+          ? new Date(asset.purchaseDate).toISOString().split("T")[0]
+          : "",
+        purchasePrice: asset.purchasePrice || 0,
+        status:
+          asset.condition === "out-of-service" ? "out-of-service" : "available",
+        image: asset.image,
+        createdAt: asset.createdAt,
+        updatedAt: asset.updatedAt,
+      }));
+
+      setAllAssets(transformedAssets);
+    } catch (err) {
+      console.error("Error loading assets:", err);
+      setError("Failed to load assets. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this helper function to convert category values to labels
+  const getCategoryLabel = (category) => {
+    const categoryMap = {
+      medical: "Medical Equipment",
+      therapy: "Therapy Tools",
+      furniture: "Furniture",
+      supplies: "Supplies",
+      other: "Other",
+    };
+    return categoryMap[category] || category;
+  };
 
   const categories = [
     "Medical Equipment",
     "Therapy Tools",
     "Furniture",
     "Supplies",
+    "Other",
   ];
 
   const conditions = [
@@ -378,8 +378,25 @@ const AllAssets = () => {
                       <tr key={asset.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                              <Package className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+                              {asset.image ? (
+                                <img
+                                  src={getImageUrl(asset.image)}
+                                  alt={asset.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to Package icon if image fails to load
+                                    e.target.style.display = "none";
+                                    e.target.nextSibling.style.display = "flex";
+                                  }}
+                                />
+                              ) : null}
+                              <Package
+                                className={`w-5 h-5 text-blue-600 ${
+                                  asset.image ? "hidden" : "block"
+                                }`}
+                                style={asset.image ? { display: "none" } : {}}
+                              />
                             </div>
                             <div>
                               <div className="text-sm font-medium text-gray-900">
@@ -508,8 +525,24 @@ const AllAssets = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center overflow-hidden">
+                          {asset.image ? (
+                            <img
+                              src={getImageUrl(asset.image)}
+                              alt={asset.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                                e.target.nextSibling.style.display = "flex";
+                              }}
+                            />
+                          ) : null}
+                          <Package
+                            className={`w-4 h-4 sm:w-5 sm:h-5 text-blue-600 ${
+                              asset.image ? "hidden" : "block"
+                            }`}
+                            style={asset.image ? { display: "none" } : {}}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm sm:text-base font-medium text-gray-900 truncate">
@@ -707,6 +740,31 @@ const AllAssets = () => {
             </div>
           )}
         </main>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading assets...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+              <p className="text-red-800">{error}</p>
+              <button
+                onClick={loadAssets}
+                className="ml-auto px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Asset Modal */}
@@ -715,8 +773,8 @@ const AllAssets = () => {
           onClose={() => setShowAddModal(false)}
           onSave={(newAssetData) => {
             console.log("New asset data:", newAssetData);
-            // Here you would typically add the asset to your state or send to API
             setShowAddModal(false);
+            loadAssets();
           }}
         />
       )}
@@ -746,10 +804,10 @@ const AllAssets = () => {
             setSelectedAsset(null);
           }}
           onSave={(updatedAsset) => {
-            // Update your assets array with the new data
             console.log("Updated asset data:", updatedAsset);
             setShowEditModal(false);
             setSelectedAsset(null);
+            loadAssets();
           }}
         />
       )}

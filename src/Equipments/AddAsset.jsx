@@ -2,14 +2,16 @@ import { useState } from "react";
 import {
   Package,
   DollarSign,
-  MapPin,
   FileText,
   Save,
   X,
   Camera,
   Settings,
   Clock,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
+import { createAsset } from "../services/api";
 
 const AddAsset = ({ onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -24,6 +26,8 @@ const AddAsset = ({ onClose, onSave }) => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const categories = [
     { value: "medical", label: "Medical Equipment" },
@@ -85,20 +89,39 @@ const AddAsset = ({ onClose, onSave }) => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess(false);
+
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Prepare data for API
+      const apiData = {
+        name: formData.name,
+        category: formData.category,
+        serialNumber: formData.serialNumber,
+        purchaseDate: formData.purchaseDate || undefined,
+        purchasePrice: formData.purchasePrice
+          ? parseFloat(formData.purchasePrice)
+          : undefined,
+        condition: formData.condition,
+      };
+
+      const result = await createAsset(apiData, formData.image);
+
+      setSubmitSuccess(true);
 
       if (onSave) {
-        onSave(formData);
+        onSave(result.data);
       }
 
-      // Reset form or close modal
-      if (onClose) {
-        onClose();
-      }
+      // Close modal after 1.5 seconds to show success message
+      setTimeout(() => {
+        if (onClose) {
+          onClose();
+        }
+      }, 1500);
     } catch (error) {
       console.error("Error saving asset:", error);
+      setSubmitError(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,6 +149,26 @@ const AddAsset = ({ onClose, onSave }) => {
             </button>
           </div>
         </div>
+
+        {/* Success/Error Messages */}
+        {(submitSuccess || submitError) && (
+          <div className="px-6 py-3 border-b border-gray-200">
+            {submitSuccess && (
+              <div className="flex items-center text-green-600 bg-green-50 p-3 rounded-lg">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                <span className="text-sm font-medium">
+                  Asset created successfully!
+                </span>
+              </div>
+            )}
+            {submitError && (
+              <div className="flex items-center text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5 mr-2" />
+                <span className="text-sm font-medium">{submitError}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Form Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
