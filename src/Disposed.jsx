@@ -323,7 +323,7 @@ const Disposed = () => {
           </div>
 
           {/* Assets List */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm">
             {/* Header */}
             <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">

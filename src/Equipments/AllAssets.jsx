@@ -20,17 +20,15 @@ import Sidebar from "../Components/Sidebar";
 import AddAsset from "./AddAsset";
 import ViewDetails from "./ViewDetails";
 import EditAsset from "./EditAsset";
-import { fetchAssets, deleteAsset } from "../services/api";
+import { fetchAssets } from "../services/api";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
 
-  // If the path already includes the full URL, return as is
   if (imagePath.startsWith("http")) {
     return imagePath;
   }
 
-  // If it's a relative path, prepend the backend URL
   return `http://localhost:5000${imagePath}`;
 };
 
@@ -322,7 +320,7 @@ const AllAssets = () => {
           </div>
 
           {/* Assets List */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm">
             {/* Header */}
             <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -333,7 +331,7 @@ const AllAssets = () => {
             </div>
 
             {/* Desktop Table */}
-            <div className="hidden lg:block overflow-x-auto">
+            <div className="hidden lg:block">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>

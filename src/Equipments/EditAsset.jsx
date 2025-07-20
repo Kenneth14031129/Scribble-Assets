@@ -9,7 +9,18 @@ import {
   Camera,
   Clock,
   AlertTriangle,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
+import { updateAsset } from "../services/api";
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+  return `http://localhost:5000${imagePath}`;
+};
 
 const EditAsset = ({ asset, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -26,29 +37,41 @@ const EditAsset = ({ asset, onClose, onSave }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  // Initialize form with asset data
   useEffect(() => {
     if (asset) {
+      // Convert category label back to value for the API
+      const getCategoryValue = (categoryLabel) => {
+        const categoryMap = {
+          "Medical Equipment": "medical",
+          "Therapy Tools": "therapy",
+          Furniture: "furniture",
+          Supplies: "supplies",
+          Other: "other",
+        };
+        return categoryMap[categoryLabel] || categoryLabel.toLowerCase();
+      };
+
       setFormData({
         name: asset.name || "",
-        category: asset.category || "",
+        category: getCategoryValue(asset.category),
         serialNumber: asset.serialNumber || "",
         purchaseDate: asset.purchaseDate || "",
         purchasePrice: asset.purchasePrice || "",
         condition: asset.condition || "excellent",
-        status: asset.status || "available",
         image: null,
       });
     }
   }, [asset]);
 
   const categories = [
-    { value: "Medical Equipment", label: "Medical Equipment" },
-    { value: "Therapy Tools", label: "Therapy Tools" },
-    { value: "Furniture", label: "Furniture" },
-    { value: "Supplies", label: "Supplies" },
-    { value: "Other", label: "Other" },
+    { value: "medical", label: "Medical Equipment" },
+    { value: "therapy", label: "Therapy Tools" },
+    { value: "furniture", label: "Furniture" },
+    { value: "supplies", label: "Supplies" },
+    { value: "other", label: "Other" },
   ];
 
   const conditionOptions = [
@@ -112,20 +135,40 @@ const EditAsset = ({ asset, onClose, onSave }) => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess(false);
+
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Prepare data for API
+      const apiData = {
+        name: formData.name,
+        category: formData.category,
+        serialNumber: formData.serialNumber,
+        purchaseDate: formData.purchaseDate || undefined,
+        purchasePrice: formData.purchasePrice
+          ? parseFloat(formData.purchasePrice)
+          : undefined,
+        condition: formData.condition,
+      };
+
+      const result = await updateAsset(asset.id, apiData, formData.image);
+
+      setSubmitSuccess(true);
+      setHasChanges(false);
 
       if (onSave) {
-        onSave({ ...asset, ...formData });
+        onSave(result.data);
       }
 
-      setHasChanges(false);
-      if (onClose) {
-        onClose();
-      }
+      // Close modal after 1.5 seconds to show success message
+      setTimeout(() => {
+        if (onClose) {
+          onClose();
+        }
+      }, 1500);
     } catch (error) {
       console.error("Error updating asset:", error);
+      setSubmitError(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -188,6 +231,26 @@ const EditAsset = ({ asset, onClose, onSave }) => {
             </div>
           )}
         </div>
+
+        {/* Success/Error Messages */}
+        {(submitSuccess || submitError) && (
+          <div className="px-4 sm:px-6 py-3 border-b border-gray-200">
+            {submitSuccess && (
+              <div className="flex items-center text-green-600 bg-green-50 p-3 rounded-lg">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                <span className="text-sm font-medium">
+                  Asset updated successfully!
+                </span>
+              </div>
+            )}
+            {submitError && (
+              <div className="flex items-center text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5 mr-2" />
+                <span className="text-sm font-medium">{submitError}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Form Content */}
         <div className="overflow-y-auto max-h-[calc(95vh-120px)] sm:max-h-[calc(90vh-140px)]">
@@ -395,6 +458,25 @@ const EditAsset = ({ asset, onClose, onSave }) => {
                         Asset Image
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 text-center hover:border-gray-400 transition-colors">
+                        {/* Current Image Display */}
+                        {asset.image && !formData.image && (
+                          <div className="mb-3">
+                            <p className="text-sm text-gray-600 mb-2">
+                              Current image:
+                            </p>
+                            <div className="flex justify-center">
+                              <img
+                                src={getImageUrl(asset.image)}
+                                alt={asset.name}
+                                className="w-20 h-20 object-cover rounded-lg border border-gray-300 mx-auto"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
                         <input
                           type="file"
                           accept="image/*"
@@ -404,13 +486,15 @@ const EditAsset = ({ asset, onClose, onSave }) => {
                         />
                         <label
                           htmlFor="image-upload"
-                          className="cursor-pointer"
+                          className="cursor-pointer block"
                         >
                           <Camera className="w-6 h-6 sm:w-8 sm:h-8 mx-auto text-gray-400 mb-2" />
                           <p className="text-xs sm:text-sm text-gray-600">
                             {formData.image
                               ? formData.image.name
-                              : "Click to upload new image"}
+                              : asset.image
+                              ? "Click to upload new image"
+                              : "Click to upload image"}
                           </p>
                         </label>
                       </div>

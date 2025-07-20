@@ -1,17 +1,22 @@
 import {
   Package,
   X,
-  MapPin,
-  User,
   DollarSign,
   FileText,
   CheckCircle,
   Clock,
-  Wrench,
   XCircle,
-  Building,
   Hash,
+  Image,
 } from "lucide-react";
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+  return `http://localhost:5000${imagePath}`;
+};
 
 const ViewDetails = ({ asset, onClose }) => {
   if (!asset) return null;
@@ -67,8 +72,25 @@ const ViewDetails = ({ asset, onClose }) => {
         <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Package className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center overflow-hidden">
+                {asset.image ? (
+                  <img
+                    src={getImageUrl(asset.image)}
+                    alt={asset.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to Package icon if image fails to load
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                ) : null}
+                <Package
+                  className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600 ${
+                    asset.image ? "hidden" : "block"
+                  }`}
+                  style={asset.image ? { display: "none" } : {}}
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 truncate">
@@ -165,15 +187,6 @@ const ViewDetails = ({ asset, onClose }) => {
                       </span>
                       <span className="text-xs sm:text-sm text-gray-900">
                         {asset.category}
-                      </span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-t border-gray-100 gap-1 sm:gap-0">
-                      <span className="text-xs sm:text-sm font-medium text-gray-500 flex items-center">
-                        <Hash className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Serial Number
-                      </span>
-                      <span className="text-xs sm:text-sm text-gray-900 font-mono break-all">
-                        {asset.serialNumber}
                       </span>
                     </div>
                   </div>
