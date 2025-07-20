@@ -1,21 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
   Eye,
   Download,
-  Package,
+  AlertCircle,
   XCircle,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   MoreVertical,
   Edit2,
+  Package,
 } from "lucide-react";
 import Header from "./Components/Header";
 import Sidebar from "./Components/Sidebar";
 import ViewDetails from "./Equipments/ViewDetails";
 import EditAsset from "./Equipments/EditAsset";
+import { fetchDisposedAssets } from "./services/api";
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+
+  return `http://localhost:5000${imagePath}`;
+};
 
 const Disposed = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,92 +42,11 @@ const Disposed = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [allAssets, setAllAssets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 4;
-
-  // Sample out-of-service assets data (all disposed/out-of-service assets)
-  const allAssets = [
-    {
-      id: 1,
-      name: "Old Ultrasound Machine",
-      serialNumber: "USM-2019-005",
-      category: "Medical Equipment",
-      condition: "poor",
-      purchaseDate: "2019-06-15",
-      purchasePrice: 38000,
-      status: "out-of-service",
-    },
-    {
-      id: 2,
-      name: "Broken Exercise Bike",
-      serialNumber: "EBP-2020-001",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2020-07-02",
-      purchasePrice: 2800,
-      status: "out-of-service",
-    },
-    {
-      id: 3,
-      name: "Damaged Physical Therapy Table",
-      serialNumber: "PTT-2018-003",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2018-05-20",
-      purchasePrice: 3200,
-      status: "out-of-service",
-    },
-    {
-      id: 4,
-      name: "Outdated X-Ray Machine",
-      serialNumber: "XRM-2017-002",
-      category: "Medical Equipment",
-      condition: "fair",
-      purchaseDate: "2017-04-10",
-      purchasePrice: 65000,
-      status: "out-of-service",
-    },
-    {
-      id: 5,
-      name: "Worn Office Chair Set",
-      serialNumber: "OCS-2019-012",
-      category: "Furniture",
-      condition: "poor",
-      purchaseDate: "2019-03-25",
-      purchasePrice: 1200,
-      status: "out-of-service",
-    },
-    {
-      id: 6,
-      name: "Faulty Nebulizer Unit",
-      serialNumber: "NEB-2020-008",
-      category: "Medical Equipment",
-      condition: "poor",
-      purchaseDate: "2020-07-18",
-      purchasePrice: 800,
-      status: "out-of-service",
-    },
-    {
-      id: 7,
-      name: "Exercise Bike Pro",
-      serialNumber: "EBP-2024-003",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2024-02-14",
-      purchasePrice: 3500,
-      status: "out-of-service",
-    },
-    {
-      id: 8,
-      name: "Exercise Bike Pro",
-      serialNumber: "EBP-2024-004",
-      category: "Therapy Tools",
-      condition: "poor",
-      purchaseDate: "2024-02-14",
-      purchasePrice: 3500,
-      status: "out-of-service",
-    },
-  ];
 
   const categories = [
     "Medical Equipment",
@@ -132,14 +63,52 @@ const Disposed = () => {
     { value: "out-of-service", label: "Out of Service", color: "gray" },
   ];
 
-  const statusOptions = [
-    {
-      value: "out-of-service",
-      label: "Out of Service",
-      color: "gray",
-      icon: XCircle,
-    },
-  ];
+  useEffect(() => {
+    loadDisposedAssets();
+  }, []);
+
+  const loadDisposedAssets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const assets = await fetchDisposedAssets();
+
+      // Transform the data to match your existing format
+      const transformedAssets = assets.map((asset) => ({
+        id: asset._id,
+        name: asset.name,
+        serialNumber: asset.serialNumber,
+        category: getCategoryLabel(asset.category),
+        condition: asset.condition,
+        purchaseDate: asset.purchaseDate
+          ? new Date(asset.purchaseDate).toISOString().split("T")[0]
+          : "",
+        purchasePrice: asset.purchasePrice || 0,
+        image: asset.image,
+        createdAt: asset.createdAt,
+        updatedAt: asset.updatedAt,
+      }));
+
+      setAllAssets(transformedAssets);
+    } catch (err) {
+      console.error("Error loading disposed assets:", err);
+      setError("Failed to load disposed assets. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this helper function
+  const getCategoryLabel = (category) => {
+    const categoryMap = {
+      medical: "Medical Equipment",
+      therapy: "Therapy Tools",
+      furniture: "Furniture",
+      supplies: "Supplies",
+      other: "Other",
+    };
+    return categoryMap[category] || category;
+  };
 
   // Filter and sort assets
   const filteredAssets = allAssets
@@ -190,10 +159,6 @@ const Disposed = () => {
   const getConditionColor = (condition) => {
     const conditionObj = conditions.find((c) => c.value === condition);
     return conditionObj ? conditionObj.color : "gray";
-  };
-
-  const getStatusInfo = (status) => {
-    return statusOptions.find((s) => s.value === status) || statusOptions[0];
   };
 
   const clearFilters = () => {
@@ -334,7 +299,7 @@ const Disposed = () => {
             </div>
 
             {/* Desktop Table */}
-            <div className="hidden lg:block overflow-x-auto">
+            <div className="hidden lg:block">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -362,9 +327,7 @@ const Disposed = () => {
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Condition
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
+
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
@@ -372,15 +335,29 @@ const Disposed = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {paginatedAssets.map((asset) => {
-                    const statusInfo = getStatusInfo(asset.status);
-                    const StatusIcon = statusInfo.icon;
-
                     return (
                       <tr key={asset.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                              <XCircle className="w-5 h-5 text-red-600" />
+                              {asset.image ? (
+                                <img
+                                  src={getImageUrl(asset.image)}
+                                  alt={asset.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to Package icon if image fails to load
+                                    e.target.style.display = "none";
+                                    e.target.nextSibling.style.display = "flex";
+                                  }}
+                                />
+                              ) : null}
+                              <Package
+                                className={`w-5 h-5 text-blue-600 ${
+                                  asset.image ? "hidden" : "block"
+                                }`}
+                                style={asset.image ? { display: "none" } : {}}
+                              />
                             </div>
                             <div>
                               <div className="text-sm font-medium text-gray-900">
@@ -420,24 +397,7 @@ const Disposed = () => {
                             }
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center">
-                            <StatusIcon
-                              className={`w-4 h-4 mr-2 ${
-                                statusInfo.color === "green"
-                                  ? "text-green-500"
-                                  : statusInfo.color === "blue"
-                                  ? "text-blue-500"
-                                  : statusInfo.color === "red"
-                                  ? "text-red-500"
-                                  : "text-gray-500"
-                              }`}
-                            />
-                            <span className="text-sm text-gray-900">
-                              {statusInfo.label}
-                            </span>
-                          </div>
-                        </td>
+
                         <td className="px-6 py-4 text-center">
                           <div className="relative">
                             <button
@@ -499,9 +459,6 @@ const Disposed = () => {
             {/* Mobile Cards */}
             <div className="lg:hidden">
               {paginatedAssets.map((asset) => {
-                const statusInfo = getStatusInfo(asset.status);
-                const StatusIcon = statusInfo.icon;
-
                 return (
                   <div
                     key={asset.id}
@@ -543,22 +500,6 @@ const Disposed = () => {
                                   (c) => c.value === asset.condition
                                 )?.label
                               }
-                            </span>
-                          </div>
-                          <div className="flex items-center mt-2">
-                            <StatusIcon
-                              className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 ${
-                                statusInfo.color === "green"
-                                  ? "text-green-500"
-                                  : statusInfo.color === "blue"
-                                  ? "text-blue-500"
-                                  : statusInfo.color === "red"
-                                  ? "text-red-500"
-                                  : "text-gray-500"
-                              }`}
-                            />
-                            <span className="text-xs sm:text-sm text-gray-900">
-                              {statusInfo.label}
                             </span>
                           </div>
                         </div>
@@ -708,6 +649,32 @@ const Disposed = () => {
             </div>
           )}
         </main>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading disposed assets...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+              <p className="text-red-800">{error}</p>
+              <button
+                onClick={loadDisposedAssets}
+                className="ml-auto px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View Details Modal */}
@@ -735,10 +702,10 @@ const Disposed = () => {
             setSelectedAsset(null);
           }}
           onSave={(updatedAsset) => {
-            // Update your assets array with the new data
             console.log("Updated asset data:", updatedAsset);
             setShowEditModal(false);
             setSelectedAsset(null);
+            loadDisposedAssets();
           }}
         />
       )}

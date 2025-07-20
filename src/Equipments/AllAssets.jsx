@@ -56,30 +56,28 @@ const AllAssets = () => {
     loadAssets();
   }, []);
 
-  // Add this function to load assets from the database
   const loadAssets = async () => {
     try {
       setLoading(true);
       setError(null);
       const assets = await fetchAssets();
 
-      // Transform the data to match your existing format
-      const transformedAssets = assets.map((asset) => ({
-        id: asset._id,
-        name: asset.name,
-        serialNumber: asset.serialNumber,
-        category: getCategoryLabel(asset.category),
-        condition: asset.condition,
-        purchaseDate: asset.purchaseDate
-          ? new Date(asset.purchaseDate).toISOString().split("T")[0]
-          : "",
-        purchasePrice: asset.purchasePrice || 0,
-        status:
-          asset.condition === "out-of-service" ? "out-of-service" : "available",
-        image: asset.image,
-        createdAt: asset.createdAt,
-        updatedAt: asset.updatedAt,
-      }));
+      const transformedAssets = assets
+        .filter((asset) => asset.condition !== "out-of-service")
+        .map((asset) => ({
+          id: asset._id,
+          name: asset.name,
+          serialNumber: asset.serialNumber,
+          category: getCategoryLabel(asset.category),
+          condition: asset.condition,
+          purchaseDate: asset.purchaseDate
+            ? new Date(asset.purchaseDate).toISOString().split("T")[0]
+            : "",
+          purchasePrice: asset.purchasePrice || 0,
+          image: asset.image,
+          createdAt: asset.createdAt,
+          updatedAt: asset.updatedAt,
+        }));
 
       setAllAssets(transformedAssets);
     } catch (err) {
@@ -90,7 +88,6 @@ const AllAssets = () => {
     }
   };
 
-  // Add this helper function to convert category values to labels
   const getCategoryLabel = (category) => {
     const categoryMap = {
       medical: "Medical Equipment",
@@ -115,23 +112,6 @@ const AllAssets = () => {
     { value: "good", label: "Good", color: "blue" },
     { value: "fair", label: "Fair", color: "yellow" },
     { value: "poor", label: "Poor", color: "red" },
-    { value: "out-of-service", label: "Out of Service", color: "gray" },
-  ];
-
-  const statusOptions = [
-    {
-      value: "available",
-      label: "Available",
-      color: "green",
-      icon: CheckCircle,
-    },
-    { value: "in-use", label: "In Use", color: "blue", icon: Clock },
-    {
-      value: "out-of-service",
-      label: "Out of Service",
-      color: "gray",
-      icon: XCircle,
-    },
   ];
 
   // Filter and sort assets
@@ -183,10 +163,6 @@ const AllAssets = () => {
   const getConditionColor = (condition) => {
     const conditionObj = conditions.find((c) => c.value === condition);
     return conditionObj ? conditionObj.color : "gray";
-  };
-
-  const getStatusInfo = (status) => {
-    return statusOptions.find((s) => s.value === status) || statusOptions[0];
   };
 
   const clearFilters = () => {
@@ -359,9 +335,7 @@ const AllAssets = () => {
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Condition
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
+
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
@@ -369,9 +343,6 @@ const AllAssets = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {paginatedAssets.map((asset) => {
-                    const statusInfo = getStatusInfo(asset.status);
-                    const StatusIcon = statusInfo.icon;
-
                     return (
                       <tr key={asset.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
@@ -383,7 +354,6 @@ const AllAssets = () => {
                                   alt={asset.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    // Fallback to Package icon if image fails to load
                                     e.target.style.display = "none";
                                     e.target.nextSibling.style.display = "flex";
                                   }}
@@ -434,24 +404,7 @@ const AllAssets = () => {
                             }
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center">
-                            <StatusIcon
-                              className={`w-4 h-4 mr-2 ${
-                                statusInfo.color === "green"
-                                  ? "text-green-500"
-                                  : statusInfo.color === "blue"
-                                  ? "text-blue-500"
-                                  : statusInfo.color === "red"
-                                  ? "text-red-500"
-                                  : "text-gray-500"
-                              }`}
-                            />
-                            <span className="text-sm text-gray-900">
-                              {statusInfo.label}
-                            </span>
-                          </div>
-                        </td>
+
                         <td className="px-6 py-4 text-center">
                           <div className="relative">
                             <button
@@ -513,9 +466,6 @@ const AllAssets = () => {
             {/* Mobile Cards */}
             <div className="lg:hidden">
               {paginatedAssets.map((asset) => {
-                const statusInfo = getStatusInfo(asset.status);
-                const StatusIcon = statusInfo.icon;
-
                 return (
                   <div
                     key={asset.id}
@@ -573,22 +523,6 @@ const AllAssets = () => {
                                   (c) => c.value === asset.condition
                                 )?.label
                               }
-                            </span>
-                          </div>
-                          <div className="flex items-center mt-2">
-                            <StatusIcon
-                              className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 ${
-                                statusInfo.color === "green"
-                                  ? "text-green-500"
-                                  : statusInfo.color === "blue"
-                                  ? "text-blue-500"
-                                  : statusInfo.color === "red"
-                                  ? "text-red-500"
-                                  : "text-gray-500"
-                              }`}
-                            />
-                            <span className="text-xs sm:text-sm text-gray-900">
-                              {statusInfo.label}
                             </span>
                           </div>
                         </div>

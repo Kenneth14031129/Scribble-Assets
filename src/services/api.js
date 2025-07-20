@@ -15,6 +15,26 @@ export const fetchAssets = async () => {
   }
 };
 
+export const fetchDisposedAssets = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/assets`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch assets');
+    }
+    const result = await response.json();
+    
+    // Filter only out-of-service assets
+    const disposedAssets = result.data.filter(asset => 
+      asset.condition === 'out-of-service'
+    );
+    
+    return disposedAssets;
+  } catch (error) {
+    console.error('Error fetching disposed assets:', error);
+    throw error;
+  }
+};
+
 // Create new asset
 export const createAsset = async (assetData, imageFile) => {
   const formData = new FormData();

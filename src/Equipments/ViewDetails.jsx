@@ -32,21 +32,6 @@ const ViewDetails = ({ asset, onClose }) => {
     return conditions[condition] || "gray";
   };
 
-  const getStatusInfo = (status) => {
-    const statusOptions = {
-      available: { label: "Available", color: "green", icon: CheckCircle },
-      "in-use": { label: "In Use", color: "blue", icon: Clock },
-      "out-of-service": {
-        label: "Out of Service",
-        color: "gray",
-        icon: XCircle,
-      },
-    };
-    return statusOptions[status] || statusOptions.available;
-  };
-
-  const statusInfo = getStatusInfo(asset.status);
-  const StatusIcon = statusInfo.icon;
   const conditionColor = getConditionColor(asset.condition);
 
   const formatCurrency = (amount) => {
@@ -113,31 +98,8 @@ const ViewDetails = ({ asset, onClose }) => {
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(95vh-80px)] sm:max-h-[calc(90vh-80px)]">
           <div className="p-3 sm:p-4 lg:p-6">
-            {/* Status and Condition Header */}
+            {/* Condition Header */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm font-medium text-gray-500">
-                    Status
-                  </span>
-                  <div className="flex items-center">
-                    <StatusIcon
-                      className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 ${
-                        statusInfo.color === "green"
-                          ? "text-green-500"
-                          : statusInfo.color === "blue"
-                          ? "text-blue-500"
-                          : statusInfo.color === "red"
-                          ? "text-red-500"
-                          : "text-gray-500"
-                      }`}
-                    />
-                    <span className="text-xs sm:text-sm font-medium text-gray-900">
-                      {statusInfo.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
               <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs sm:text-sm font-medium text-gray-500">

@@ -51,7 +51,6 @@ const createAsset = async (req, res) => {
   try {
     const assetData = req.body;
     
-    // Add image path if file was uploaded
     if (req.file) {
       assetData.image = `/uploads/assets/${req.file.filename}`;
     }
@@ -65,7 +64,6 @@ const createAsset = async (req, res) => {
       data: savedAsset
     });
   } catch (error) {
-    // Delete uploaded file if database save fails
     if (req.file) {
       fs.unlink(req.file.path, (err) => {
         if (err) console.error('Error deleting file:', err);
@@ -92,11 +90,9 @@ const updateAsset = async (req, res) => {
   try {
     const updateData = req.body;
     
-    // Add new image path if file was uploaded
     if (req.file) {
       updateData.image = `/uploads/assets/${req.file.filename}`;
       
-      // Delete old image file
       const oldAsset = await Asset.findById(req.params.id);
       if (oldAsset && oldAsset.image) {
         const oldImagePath = path.join(__dirname, '..', oldAsset.image);
@@ -125,7 +121,6 @@ const updateAsset = async (req, res) => {
       data: asset
     });
   } catch (error) {
-    // Delete uploaded file if update fails
     if (req.file) {
       fs.unlink(req.file.path, (err) => {
         if (err) console.error('Error deleting file:', err);
@@ -152,7 +147,6 @@ const deleteAsset = async (req, res) => {
       });
     }
 
-    // Delete associated image file
     if (asset.image) {
       const imagePath = path.join(__dirname, '..', asset.image);
       fs.unlink(imagePath, (err) => {

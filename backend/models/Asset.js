@@ -30,7 +30,7 @@ const assetSchema = new mongoose.Schema({
     default: 'excellent'
   },
   image: {
-    type: String // URL or file path
+    type: String
   },
   createdAt: {
     type: Date,
@@ -42,7 +42,6 @@ const assetSchema = new mongoose.Schema({
   }
 });
 
-// Update the updatedAt field before saving
 assetSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();

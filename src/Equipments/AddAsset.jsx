@@ -113,7 +113,6 @@ const AddAsset = ({ onClose, onSave }) => {
         onSave(result.data);
       }
 
-      // Close modal after 1.5 seconds to show success message
       setTimeout(() => {
         if (onClose) {
           onClose();

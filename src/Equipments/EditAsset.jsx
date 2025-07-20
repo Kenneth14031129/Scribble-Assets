@@ -30,7 +30,6 @@ const EditAsset = ({ asset, onClose, onSave }) => {
     purchaseDate: "",
     purchasePrice: "",
     condition: "excellent",
-    status: "available",
     image: null,
   });
 
@@ -80,12 +79,6 @@ const EditAsset = ({ asset, onClose, onSave }) => {
     { value: "fair", label: "Fair", color: "yellow" },
     { value: "poor", label: "Poor", color: "red" },
     { value: "out-of-service", label: "Out of Service", color: "gray" },
-  ];
-
-  const statusOptions = [
-    { value: "available", label: "Available" },
-    { value: "in-use", label: "In Use" },
-    { value: "out-of-service", label: "Out of Service" },
   ];
 
   const handleInputChange = (e) => {
@@ -198,7 +191,23 @@ const EditAsset = ({ asset, onClose, onSave }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <Package className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
+                {asset.image ? (
+                  <img
+                    src={getImageUrl(asset.image)}
+                    alt={asset.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                ) : null}
+                <Package
+                  className={`w-5 h-5 text-blue-600 ${
+                    asset.image ? "hidden" : "block"
+                  }`}
+                  style={asset.image ? { display: "none" } : {}}
+                />
               </div>
               <div>
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
@@ -392,24 +401,6 @@ const EditAsset = ({ asset, onClose, onSave }) => {
                   </h3>
 
                   <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                      </label>
-                      <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                      >
-                        {statusOptions.map((status) => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Condition
