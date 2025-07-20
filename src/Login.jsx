@@ -9,15 +9,14 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "./services/authApi";
+import { useToast } from "./contexts/ToastContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "admin@therapy.com",
-    password: "Admin12345",
-    rememberMe: false,
-  });
+  const { showSuccess, showError } = useToast();
+  const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -28,15 +27,36 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await loginUser(formData.email, formData.password);
+
+      // Show success toast
+      showSuccess("Login successful! Redirecting to dashboard...", 3000);
+
+      console.log("Login successful:", result);
+
+      // Small delay to show the success message before navigating
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+    } catch (error) {
+      console.error("Login error:", error.message);
+
+      // Show error toast with specific message
+      if (error.message.includes("Invalid email or password")) {
+        showError("Invalid email or password. Please try again.", 5000);
+      } else if (error.message.includes("Network")) {
+        showError("Network error. Please check your connection.", 5000);
+      } else {
+        showError(error.message || "Login failed. Please try again.", 5000);
+      }
+    } finally {
       setIsLoading(false);
-      console.log("Login attempted with:", formData);
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -120,7 +140,7 @@ const Login = () => {
                 </p>
               </div>
 
-              <div className="space-y-5 md:space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
                 {/* Email Field */}
                 <div>
                   <label
@@ -137,6 +157,7 @@ const Login = () => {
                       id="email"
                       name="email"
                       type="email"
+                      required
                       value={formData.email}
                       onChange={handleInputChange}
                       className="block w-full pl-9 md:pl-10 pr-3 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
@@ -144,6 +165,7 @@ const Login = () => {
                     />
                   </div>
                 </div>
+
                 {/* Password Field */}
                 <div>
                   <label
@@ -160,6 +182,7 @@ const Login = () => {
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
+                      required
                       value={formData.password}
                       onChange={handleInputChange}
                       className="block w-full pl-9 md:pl-10 pr-9 md:pr-10 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
@@ -178,10 +201,28 @@ const Login = () => {
                     </button>
                   </div>
                 </div>
+
+                {/* Remember Me Checkbox */}
+                <div className="flex items-center">
+                  <input
+                    id="rememberMe"
+                    name="rememberMe"
+                    type="checkbox"
+                    checked={formData.rememberMe}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="rememberMe"
+                    className="ml-2 block text-sm text-gray-700"
+                  >
+                    Remember me
+                  </label>
+                </div>
+
                 {/* Login Button */}
                 <button
-                  type="button"
-                  onClick={handleSubmit}
+                  type="submit"
                   disabled={isLoading}
                   className="w-full bg-gradient-to-br from-blue-500 to-blue-700 text-white py-2.5 md:py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm md:text-base"
                 >
@@ -194,13 +235,16 @@ const Login = () => {
                     "Sign in to Dashboard"
                   )}
                 </button>
-              </div>
+              </form>
 
               {/* Additional Links */}
               <div className="mt-6 md:mt-8 text-center">
                 <p className="text-xs md:text-sm text-gray-600">
                   Forgot your email or password?{" "}
-                  <button className="text-blue-600 hover:text-blue-800 transition-colors font-medium">
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                  >
                     Contact IT Support
                   </button>
                 </p>

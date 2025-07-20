@@ -1,20 +1,24 @@
 /* eslint-disable no-undef */
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// Configure storage
+const uploadsDir = path.join(__dirname, '../uploads/assets');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('✅ Created uploads/assets directory');
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/assets/') // Directory to save files
+    cb(null, 'uploads/assets/')
   },
   filename: function (req, file, cb) {
-    // Generate unique filename: timestamp + original extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// File filter (only images)
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -23,12 +27,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024
   }
 });
 
